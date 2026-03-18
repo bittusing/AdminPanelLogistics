@@ -14,7 +14,7 @@ import {
   Calendar,
   Tag
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/api';
 
 const SupportTickets = () => {
   const [tickets, setTickets] = useState([]);
@@ -44,12 +44,7 @@ const SupportTickets = () => {
       if (filters.category) params.append('category', filters.category);
       if (filters.priority) params.append('priority', filters.priority);
 
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/support/tickets?${params}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await api.get(`/admin/support/tickets?${params}`);
 
       if (response.data.success) {
         setTickets(response.data.data.tickets || []);
@@ -66,13 +61,7 @@ const SupportTickets = () => {
       setActionLoading(true);
       const token = localStorage.getItem('adminToken');
       
-      const response = await axios.patch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/support/tickets/${ticketId}/status`,
-        { status: newStatus },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await api.patch(`/admin/support/tickets/${ticketId}/status`, { status: newStatus });
 
       if (response.data.success) {
         fetchTickets();
@@ -94,23 +83,12 @@ const SupportTickets = () => {
       setActionLoading(true);
       const token = localStorage.getItem('adminToken');
       
-      const response = await axios.post(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/support/tickets/${ticketId}/reply`,
-        { message: replyMessage },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      const response = await api.post(`/admin/support/tickets/${ticketId}/reply`, { message: replyMessage });
 
       if (response.data.success) {
         setReplyMessage('');
         // Refresh ticket details
-        const ticketResponse = await axios.get(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/support/tickets/${ticketId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+        const ticketResponse = await api.get(`/admin/support/tickets/${ticketId}`);
         if (ticketResponse.data.success) {
           setSelectedTicket(ticketResponse.data.data.ticket);
         }

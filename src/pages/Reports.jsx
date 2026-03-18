@@ -13,7 +13,7 @@ import {
   BarChart3,
   PieChart
 } from 'lucide-react';
-import axios from 'axios';
+import api from '../config/api';
 
 const Reports = () => {
   const [loading, setLoading] = useState(false);
@@ -88,19 +88,13 @@ const Reports = () => {
       const token = localStorage.getItem('adminToken');
       
       // API call to generate report
-      const response = await axios.get(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/admin/reports/${reportId}`,
-        {
-          params: {
-            startDate: dateRange.from,
-            endDate: dateRange.to
-          },
-          headers: {
-            Authorization: `Bearer ${token}`
-          },
-          responseType: 'blob' // For CSV/PDF download
-        }
-      );
+      const response = await api.get(`/admin/reports/${reportId}`, {
+        params: {
+          startDate: dateRange.from,
+          endDate: dateRange.to
+        },
+        responseType: 'blob' // For CSV/PDF download
+      });
 
       // Create download link
       const url = window.URL.createObjectURL(new Blob([response.data]));
